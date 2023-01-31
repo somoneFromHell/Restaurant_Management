@@ -1,6 +1,5 @@
 require('./db/connect')
 const express = require('express');
-const config = require('config')
 const AppError = require('./utility/appError')
 const globalErrorHandler = require('./controllers/errorController')
 const food = require('./routes/Food');
@@ -10,7 +9,6 @@ const order = require('./routes/order');
 const orderItem = require('./routes/orderItems');
 const table = require('./routes/table');
 const user = require('./routes/user');
-const { required } = require('joi');
 
 
 const app = express();

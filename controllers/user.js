@@ -1,68 +1,60 @@
 
 const { userModel, validateLogin, validateRegistration } = require('../models/user')
 const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
 const config = require('config')
+const catchAsync = require('../utility/catchError')
+const AppError = require('../utility/appError')
 
-const getUsers = async (req, res) => {
-    try {
-
+const getUsers = catchAsync(async (req, res,next) => {
+        console.log("called")
         const records = userModel.find()
-        if (!records) res.status(400).send('no data..')
+        if(!records){
+            return next(new AppError('Error...',400))
+        }
         res.send(records)
 
-    } catch (error) {
-        res.send({ msg: error })
-    }
-}
+
+})
 
 const GetUserById = (req, res) => {
 
 }
 
-const login = async (req, res) => {
+const login = catchAsync(async (req, res,next ) => {
 
-    try {
 
-        const { error } = validateLogin(req.body);
-        if (error) res.send.status(400).send(error.details[0].message)
+        var {email,password} = new userModel(req.body);
+        if (!email||!password) return res.status(400).send("not enaugh data")
 
         const user = await userModel.findOne({ email: req.body.email });
-        if (!user) res.status(400).send('invalid Email or password');
+        if (!user) next(new AppError('incorrect email or password !!',400));
+        
+        console.log(user)
 
-        const validPassword = bcrypt.compare('fuck',req.body.password, user.password);
-        if (!validPassword) res.status(400).send('invalid password');
+        const validPassword = bcrypt.compareSync(req.body.password,user.password)
+        if (!validPassword) next(new AppError('incorrect email or password !!',400));
+        const token = user.genratAuthToken();
+        res.header('Authorization',token).send({success:true,msg:token})
+})
 
-        const token = jwt.sign({_id:user._id},"jwtPrivateKey")
-        console.log(token)
-        res.send(token)
-    } catch (err) {
-
-    }
-
-}
-
-const signup = async (req, res) => {
-    try {
-
-        const {error} = validateRegistration(req.body)
-        if (error) {res.status(400).send(error.details[0].message)}
+const signup = catchAsync(async (req, res) => {
 
         var record = new userModel(req.body);
-        if (!record) res.status(400).send("error")
 
-        const salt = await bcrypt.genSalt(10);
-        record.password = await bcrypt.hash(record.password, salt)
-        await record.save();
+        // const salt = await bcrypt.genSalt(10);
+        // record.password = await bcrypt.hash(record.password, salt)
+        await record.save({
+                firstName:req.body.firstName,
+                lastName:req.body.lastName,
+                email:req.body.email,
+                password:req.body.password
+        });
         
-        const token = jwt.sign({_id:record.id},"jwtPrivateKey")
-        res.header('x-auth-token',token).send({ Id: record.id, email: record.email, firstName: record.firstName, lastname: record.lastName })
+        const token = record.genratAuthToken();
+        res.header('Authorization',token).send({ Id: record.id, email: record.email, firstName: record.firstName, lastname: record.lastName })
 
 
 
-    } catch (error) {
-        res.send(error)
-    }
-}
+})
 
 module.exports = { getUsers, GetUserById, login, signup }

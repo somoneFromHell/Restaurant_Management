@@ -1,11 +1,11 @@
-const { foodModel } = require('../models/Food');
+const  foodModel  = require('../models/Food');
 const { menuModel } = require('../models/menu');
 const mongo = require('mongoose')
 const catchAsync = require('../utility/catchError');
 const AppError = require('../utility/appError');
 
 const getFood = catchAsync(async (req, res) => {
-        const records = await foodModel.find({})
+        const records = await foodModel.find()
         if (!records) {
             return next(new AppError('empty...'))
         }
