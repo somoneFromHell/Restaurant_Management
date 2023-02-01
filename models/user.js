@@ -1,7 +1,8 @@
 const Joi = require('joi');
 const mongo = require('mongoose');
 const jwt = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
+const { string } = require('joi');
 
 const registerSchema = new mongo.Schema({
     firstName: {
@@ -32,7 +33,12 @@ const registerSchema = new mongo.Schema({
                 return /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(v);
             }, message:props => `${props.value} not a strong password \n must contain Minimum eight characters, at least one letter and one number`
         }
-    }
+    },
+    role:{
+        type:String,
+        required:true
+    },
+    passwordChangedAt:Date
 })
 
 registerSchema.pre('save', async function (next) {
@@ -44,10 +50,23 @@ registerSchema.pre('save', async function (next) {
 })
 
 
+
 registerSchema.methods.genratAuthToken = function(){
     const token = jwt.sign({id: this._id}, "jwtPrivateKey",{expiresIn:'1d'})
     return token;
 }
+
+// compare change password date with tocken isueing date 
+registerSchema.methods.changePasswordAfter = function(jwtTimeStamp){
+    if(this.passwordChangedAt){
+         const changeTimeStamp = parseInt(
+             this.passwordChangedAt.getTime()/1000,10
+        )
+        console.log(changeTimeStamp,jwtTimeStamp);
+        return jwtTimeStamp>changeTimeStamp
+    }
+    return false;
+};
 
 const userModel = mongo.model('user', registerSchema)
 

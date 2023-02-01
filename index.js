@@ -9,6 +9,7 @@ const order = require('./routes/order');
 const orderItem = require('./routes/orderItems');
 const table = require('./routes/table');
 const user = require('./routes/user');
+const roles = require('./routes/roles')
 
 
 const app = express();
@@ -28,7 +29,7 @@ app.use('/api/order', order);
 app.use('/api/orderitem', orderItem);
 app.use('/api/table', table);
 app.use('/api/user', user);
-
+app.use('/api/roles',roles)
 
 app.all('*',(req,res,next)=>{
     next(new AppError(`cant find on ${req.originalUrl} on this server`,400))

@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt')
 const config = require('config')
 const catchAsync = require('../utility/catchError')
 const AppError = require('../utility/appError')
+const { rolesModel } = require('../models/roles')
 
 const getUsers = catchAsync(async (req, res,next) => {
         console.log("called")
@@ -39,6 +40,10 @@ const login = catchAsync(async (req, res,next ) => {
 
 const signup = catchAsync(async (req, res) => {
 
+        var getRole = rolesModel.findById(req.body._id)
+        if(!getRole){
+                return next(AppError("role dusent Exist...",400))
+        }
         var record = new userModel(req.body);
 
         // const salt = await bcrypt.genSalt(10);
@@ -47,7 +52,8 @@ const signup = catchAsync(async (req, res) => {
                 firstName:req.body.firstName,
                 lastName:req.body.lastName,
                 email:req.body.email,
-                password:req.body.password
+                password:req.body.password,
+                role:req.body.role
         });
         
         const token = record.genratAuthToken();
