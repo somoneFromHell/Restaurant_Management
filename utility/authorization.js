@@ -6,7 +6,11 @@ const {promisify} = require('util');
 const { userModel } = require('../models/user');
 const { rolesModel } = require('../models/roles');
 
-module.exports.authorize = catchAsync(async(req,res,next)=>{
+const authorize = catchAsync(async(req,res,next)=>{
+
+    const Api =  req.originalUrl.split("/")[2]
+    if(Api === 'user'){return next()}
+
     let token 
     if(req.header('Authorization') &&  req.header('Authorization').startsWith('Bearer'))
     {
@@ -29,18 +33,16 @@ module.exports.authorize = catchAsync(async(req,res,next)=>{
     //    (2) cheak if the user is allowd to execute this operation
 
     const userRole = await rolesModel.findById(currentUser.role)
-    const Api =  req.originalUrl.split('/')[2]
-    const method = req.method
     const routInRole = userRole.routs.filter((item)=>item.name === Api)
-    console.log(Api,routInRole)
-    if(!routInRole){
-        console.log('error')
-        return next(new AppError('not authorized',401))
+   // console.log(Api,routInRole)
+    if(!routInRole.length){
+        return next(new AppError(`You are not authorized to access this route ${Api}`,401))
     }
-    // if(routInRole.rights.){
-    //     return next(new AppError('not authorized',401))
-
-    // }
+    
+     if(!routInRole[0].rights[req.method]){
+        
+         return next(new AppError(`You are not authorized to access ${req.method} request at route ${Api}`,401  ))
+     }
     
 
 // (4) cheak if password has changed after the token is isued
@@ -50,3 +52,5 @@ module.exports.authorize = catchAsync(async(req,res,next)=>{
     req.user = currentUser;
     next()
 })
+
+module.exports = authorize

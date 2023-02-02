@@ -10,6 +10,7 @@ const orderItem = require('./routes/orderItems');
 const table = require('./routes/table');
 const user = require('./routes/user');
 const roles = require('./routes/roles')
+const authorize = require('./utility/authorization')
 
 
 const app = express();
@@ -22,6 +23,8 @@ const app = express();
 app.use(express.json())
 
 
+
+app.use(authorize)
 app.use('/api/food', food);
 app.use('/api/invoice', invoice);
 app.use('/api/menu', menu);
