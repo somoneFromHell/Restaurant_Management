@@ -21,9 +21,11 @@ const addTable = catchAsync(async(req,res)=>{
     res.send(record)
 })
 
-const updateTable = catchAsync(async (req,res)=>{
-    const updatedRecord = await tableModel.findByIdAndUpdate(req.params.id,req.body, { new: true, runValidators: true })
-    if(updatedRecord){
+const updateTable = catchAsync(async (req,res,next)=>{
+    const updatedRecord = await tableModel.updateOne({_id:req.params.id},req.body, { new: true, runValidators: true })
+    console.log(updatedRecord)
+    if(updatedRecord.matchedCount==0){
+        console.log("yas")
         return next(new AppError('no data with id '+ req.params.id))
     }
     res.send(updatedRecord)
