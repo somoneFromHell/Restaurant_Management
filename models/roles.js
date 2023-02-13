@@ -8,9 +8,6 @@ const rightsModel = new mongo.Schema({
     DELETE:{type:Boolean,required:true},
     GET:{type:Boolean,required:true}
 })
-
-
-
 const routsModel = new mongo.Schema({
     name:{type:String},
     rights:{type:rightsModel}

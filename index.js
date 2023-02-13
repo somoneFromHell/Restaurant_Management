@@ -1,5 +1,6 @@
 require('./db/connect')
 const express = require('express');
+const cors = require('cors')
 const AppError = require('./utility/appError')
 const globalErrorHandler = require('./controllers/errorController')
 const food = require('./routes/Food');
@@ -15,6 +16,30 @@ const authorize = require('./utility/authorization')
 
 const app = express();
 
+const swaggerJSDoc =  require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express')
+
+const option = {
+
+    definition:{
+        openapi:'3.0.0',
+        info:{
+            title:'restorent management',
+            version:'1.0.0'
+        },
+        servers:[
+            {
+                url:"http://localhost:3200/"
+            }
+        ]
+    },
+    apis:['./index.js']
+}
+
+const swaggerSpec = swaggerJSDoc(option)
+app.use(cors({origin:'*'}))
+app.use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerSpec))
+
 // if (!config.get('jwtPrivateKey')) {
 //     console.error('Error:jwtprivate1key is not defined')
 //     process.exit(0);
@@ -23,8 +48,7 @@ const app = express();
 app.use(express.json())
 
 
-
-app.use(authorize)
+// app.use(authorize)
 app.use('/api/food', food);
 app.use('/api/invoice', invoice);
 app.use('/api/menu', menu);

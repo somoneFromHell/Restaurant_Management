@@ -1,5 +1,6 @@
 const catchAsync = require('../utility/catchError')
 const tableModel = require('../models/table')
+const AppError = require('../utility/appError')
 
 const getTable = catchAsync(async(req,res)=>{
 
@@ -9,6 +10,9 @@ const getTable = catchAsync(async(req,res)=>{
 
 const getTableById = catchAsync(async(req,res)=>{
     const record = await tableModel.findById(req.params.id)
+    if(!record){
+        next(new AppError('no data with id' + req.params.id))
+    }
     res.send(record)
 })
 
@@ -19,12 +23,18 @@ const addTable = catchAsync(async(req,res)=>{
 
 const updateTable = catchAsync(async (req,res)=>{
     const updatedRecord = await tableModel.findByIdAndUpdate(req.params.id,req.body, { new: true, runValidators: true })
+    if(updatedRecord){
+        return next(new AppError('no data with id '+ req.params.id))
+    }
     res.send(updatedRecord)
 })
 
-const deletTable = catchAsync(async(req,res)=>{
+const deletTable = catchAsync(async(req,res,next)=>{
 
     const deletedRecord = await tableModel.findByIdAndDelete(req.params.id)
+    if(!deletedRecord){
+        return next(new AppError('no data with id '+req.params.id))
+    }
     res.send(deletedRecord)
 })
 
