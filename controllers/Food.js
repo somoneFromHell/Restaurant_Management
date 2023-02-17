@@ -31,9 +31,10 @@ const updateFood = catchAsync(async (req, res,next) => {
 })
 
 const addFood = catchAsync(async (req, res,next) => {
+        
         menuExist = await menuModel.findById(req.body.menuId)
         if(!menuExist){
-                return next(new AppError('no data with given menuId',404))
+                return next(new AppError(`no data with given menuId ${req.body.menuId}`,404))
         }
         const record = await foodModel.create(req.body)
         res.send(record)

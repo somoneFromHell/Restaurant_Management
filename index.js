@@ -12,40 +12,18 @@ const table = require('./routes/table');
 const user = require('./routes/user');
 const roles = require('./routes/roles')
 const authorize = require('./utility/authorization')
-
-
+var bodyParser = require('body-parser');
 const app = express();
 
-const swaggerJSDoc =  require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express')
-
-const option = {
-
-    definition:{
-        openapi:'3.0.0',
-        info:{
-            title:'restorent management',
-            version:'1.0.0'
-        },
-        servers:[
-            {
-                url:"http://localhost:3200/"
-            }
-        ]
-    },
-    apis:['./index.js']
-}
-
-const swaggerSpec = swaggerJSDoc(option)
 app.use(cors({origin:'*'}))
-app.use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerSpec))
 
 // if (!config.get('jwtPrivateKey')) {
 //     console.error('Error:jwtprivate1key is not defined')
 //     process.exit(0);
 // }
 
-app.use(express.json())
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json())
 
 
 // app.use(authorize)
