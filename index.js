@@ -27,7 +27,7 @@ app.use(cors({origin:'*'}))
 // }
 console.log(process.env.NODE_ENV)
 
-if(process.env.NODE_ENV === 'developement'){
+if(process.env.NODE_ENV === 'development'){
     app.use(morgan('dev'));
 }
 
@@ -35,6 +35,8 @@ if(process.env.NODE_ENV === 'developement'){
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
 
+//defining route for food images
+app.use('/foodImages',express.static('public/image/food'))
 
 // app.use(authorize)
 app.use('/api/food', food);
@@ -55,4 +57,4 @@ app.use(globalErrorHandler)
 
 const port = process.env.PORT || 3200;
 
-app.listen(port, () => console.log(`listning on ${port}...`));
+app.listen(port, () => console.log(`listening on ${port}...`));

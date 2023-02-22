@@ -1,7 +1,7 @@
 const mongo = require('mongoose');
 
 const orderItemModel = mongo.model('orderitem', new mongo.Schema({
-    quntity: { type: String, required: true, enum: ['small', 'medium', 'large'] },
+    quantity: { type: String, required: true, enum: ['small', 'medium', 'large'] },
     unitPrice: { type: Number, required: true },
     foodId: {
         type: String,required:true,

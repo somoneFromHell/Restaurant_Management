@@ -3,6 +3,31 @@ const { menuModel } = require('../models/menu');
 const mongo = require('mongoose')
 const catchAsync = require('../utility/catchError');
 const AppError = require('../utility/appError');
+const multer = require('multer')
+
+
+const multarStorage = multer.diskStorage({
+        destination:(req,file,cb)=>{
+                cb(null,'public/image/food')
+        },
+        filename(req,file,cb){
+                const ext =file.mimetype.split('/')[1];
+                cb(null,`${req.body.food}-${Date.now()}.${ext}`)
+        }
+})
+
+const multerFilter = (req,file,cb)=>{
+        if(file.mimetype.split('/')[0] === 'image'){
+                cb(null,true)
+        }else{
+                cb(new AppError('not an image',400),false)
+        }
+}
+
+const upload = multer({storage:multarStorage,fileFilter:multerFilter})
+
+
+const imageUpload = upload.single('foodImage')
 
 const getFood = catchAsync(async (req, res) => {
         const records = await foodModel.find()
@@ -31,12 +56,15 @@ const updateFood = catchAsync(async (req, res,next) => {
 })
 
 const addFood = catchAsync(async (req, res,next) => {
-        
+        console.log(req.file)
         menuExist = await menuModel.findById(req.body.menuId)
         if(!menuExist){
                 return next(new AppError(`no data with given menuId ${req.body.menuId}`,404))
         }
+        if(req.file){req.body.foodImage = req.file.filename;}
+        else{req.body.foodImage = 'noimage.jpg'}
         const record = await foodModel.create(req.body)
+        
         res.send(record)
 })
 
@@ -49,4 +77,4 @@ const deletFood = catchAsync(async (req, res,next) => {
 })
 
 
-module.exports = { getFood, getFoodById, addFood, updateFood, deletFood }
+module.exports = { getFood, getFoodById, imageUpload,addFood, updateFood, deletFood }
