@@ -3,6 +3,9 @@ const express = require('express');
 const cors = require('cors')
 const AppError = require('./utility/appError')
 const globalErrorHandler = require('./controllers/errorController')
+require('dotenv').config({'path':'config.env'})
+
+
 const food = require('./routes/Food');
 const invoice = require('./routes/invoice');
 const menu = require('./routes/menu');
@@ -13,6 +16,7 @@ const user = require('./routes/user');
 const roles = require('./routes/roles')
 const authorize = require('./utility/authorization')
 var bodyParser = require('body-parser');
+const morgan = require('morgan');
 const app = express();
 
 app.use(cors({origin:'*'}))
@@ -21,6 +25,12 @@ app.use(cors({origin:'*'}))
 //     console.error('Error:jwtprivate1key is not defined')
 //     process.exit(0);
 // }
+console.log(process.env.NODE_ENV)
+
+if(process.env.NODE_ENV === 'developement'){
+    app.use(morgan('dev'));
+}
+
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
@@ -42,9 +52,7 @@ app.all('*',(req,res,next)=>{
 
 app.use(globalErrorHandler)
 
-// continue from herer  https://www.youtube.com/watch?v=wGplIsZm95Q&list=PLx6gGOAOEqGHqDaIjFhwnojD4Lhf4kU_N&index=111
 
-
-const port = process.env.port || 3200;
+const port = process.env.PORT || 3200;
 
 app.listen(port, () => console.log(`listning on ${port}...`));

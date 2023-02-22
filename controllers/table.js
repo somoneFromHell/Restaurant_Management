@@ -18,6 +18,7 @@ const getTableById = catchAsync(async(req,res)=>{
 
 const addTable = catchAsync(async(req,res)=>{
     const record = await tableModel.create(req.body)
+    if(record.occupied === false)record.currentGuests=0
     res.send(record)
 })
 
