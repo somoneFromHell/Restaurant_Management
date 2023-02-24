@@ -1,3 +1,4 @@
+const { default: mongoose } = require('mongoose');
 const mongo = require('mongoose');
 
 
@@ -6,7 +7,7 @@ const foodModel = mongo.model('food',new mongo.Schema({
     description:{type:String,required:true},
     price:{type:Number,required:true},
     foodImage:{type:String,required:true},
-    menuId:{type:String,required:true},   
+    menuId:{type:mongoose.Schema.Types.ObjectId,ref:'menu',required:true},   
 }));
 
 module.exports = foodModel

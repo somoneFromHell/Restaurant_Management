@@ -46,6 +46,15 @@ const getFoodById = catchAsync(async (req, res,next) => {
 
 })
 
+const getFoodByMenuId = catchAsync(async(req,res,next)=>{
+        const record = await menuModel.findById(req.params.menuId)
+        if(!record){
+                return next(new AppError('no data with Id'+req.params.menuId,404))
+        }
+        const records = await foodModel.find({menuId:req.params.menuId})
+        res.send(records)
+})
+
 const updateFood = catchAsync(async (req, res,next) => {
 
         const record = await foodModel.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
@@ -77,4 +86,4 @@ const deletFood = catchAsync(async (req, res,next) => {
 })
 
 
-module.exports = { getFood, getFoodById, imageUpload,addFood, updateFood, deletFood }
+module.exports = { getFood, getFoodById,getFoodByMenuId ,imageUpload,addFood, updateFood, deletFood }

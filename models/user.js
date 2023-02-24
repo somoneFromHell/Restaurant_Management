@@ -3,6 +3,7 @@ const mongo = require('mongoose');
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
 const { string } = require('joi');
+const { default: mongoose } = require('mongoose');
 
 const registerSchema = new mongo.Schema({
     firstName: {
@@ -35,7 +36,7 @@ const registerSchema = new mongo.Schema({
         }
     },
     role:{
-        type:String,
+        type: mongoose.Schema.Types.ObjectId,ref:'roles',
         required:true
     },
     passwordChangedAt:Date

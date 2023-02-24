@@ -8,10 +8,11 @@ const catchAsync = require('../utility/catchError')
 const getOrderItem = catchAsync(async(req,res)=>{
     const records = await orderItemModel.find()
     res.send(records)
+    console.log('get orders called')
 })
 
 const getOrderItemById = catchAsync(async (req,res)=>{
-    const record = await orderItemModel.findById(req.params.id)
+    const record = await orderItemModel.find({_id:req.params.id})
     if(!record){
         return next(new AppError("orderItemId"+req.params.id+"not exist",400))
     }
@@ -51,9 +52,22 @@ const updateItem = catchAsync(async(req,res,next)=>{
     res.send(updatedRecord)
 })
 
+
+const getItemsByOrderId = catchAsync(async(req,res,next)=>{
+    const oid = req.params.orderId
+    const orderExist = await orderModel.findById(oid).select('_id').lean();
+    if(!orderExist){
+        return next(new AppError(`order with Id ${oid} does not exist`))
+    }
+
+    const orderItems = await orderModel.find({orderId:oid})
+    console.log(orderItems)
+    res.send(orderItems)
+})
+
 const deletItem  = catchAsync(async(req,res)=>{
     const deletedRecord = await orderItemModel.findByIdAndDelete(req.params.id)
     res.send(deletedRecord)
 })
 
-module.exports = {getOrderItem,getOrderItem,addOrderItem,updateItem,deletItem,getOrderItemById}
+module.exports = {getOrderItem,getOrderItem,addOrderItem,updateItem,getItemsByOrderId,deletItem,getOrderItemById}

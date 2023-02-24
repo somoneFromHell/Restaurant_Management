@@ -1,4 +1,3 @@
-const { string, date } = require('joi');
 const mongo = require('mongoose')
 
 const menuModel = mongo.model('menu', new mongo.Schema({
