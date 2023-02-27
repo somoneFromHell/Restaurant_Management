@@ -1,9 +1,9 @@
 const express = require('express');
-const { getOrderItem, addOrderItem,getItemsByOrderId, getOrderItemById, updateItem, deletItem } = require('../controllers/orderItems');
+const { getOrderItem, addOrderItem, deletItem, updateOrderItem } = require('../controllers/orderItems');
 const router = express.Router();
 
-router.route('/').get(getOrderItem).post(addOrderItem)
-router.route('/byOrder/:orderId').get(getItemsByOrderId)
-router.route('/:id').get(getOrderItemById).put(updateItem).delete(deletItem)
+router.route('/:orderId').get(getOrderItem)
+router.route('/add/:orderId').put(addOrderItem)
+router.route('/:orderId/:orderItemId').delete(deletItem).put(updateOrderItem)
 
 module.exports = router;

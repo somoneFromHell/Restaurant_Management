@@ -5,69 +5,60 @@ const AppError = require('../utility/appError')
 const catchAsync = require('../utility/catchError')
 
 
-const getOrderItem = catchAsync(async(req,res)=>{
-    const records = await orderItemModel.find()
-    res.send(records)
-    console.log('get orders called')
-})
-
-const getOrderItemById = catchAsync(async (req,res)=>{
-    const record = await orderItemModel.find({_id:req.params.id})
+const getOrderItem = catchAsync(async(req,res,next)=>{
+    const record = await orderModel.findById(req.params.orderId);
     if(!record){
-        return next(new AppError("orderItemId"+req.params.id+"not exist",400))
+        return next(new AppError('order dusent exist',400))
     }
-    res.send(record)
+    res.send(record.orderItems)
 })
 
-const addOrderItem =catchAsync(async(req,res,next)=>{
-    const foodIdExist = await foodModel.findById(req.body.foodId).select("_id").lean();
-    if(!foodIdExist){
-        return next(new AppError(`food item with id ${req.body.foodId} dos not exist`))
+const updateOrderItem = catchAsync(async(req,res)=>{
+    const order = await orderModel.findById(req.params.orderId)
+    if(!order){
+        return next(new AppError('order dusent exist',400))
     }
-
-    const oderIdExist = await orderModel.findOne({_id:req.body.orderId}).select("_id").lean();
-    if(!oderIdExist){
-        return next(new AppError(`order with id ${req.body.orderId} does not exists`))
+     const updateddRecord = await orderModel.findOne({_id:req.params.orderId}).then(doc=>{
+        item = doc.orderItems.id(req.params.orderItemId)
+        item["quantity"]=req.body.quantity;
+        item["foodId"]=req.body.foodId;
+        doc.save();
+     })
+          if(!updateddRecord){
+         return next(new AppError('order Item dusent exist',400))
     }
-    const record = await orderItemModel.create(req.body)
-
-    res.send(record)
+    res.send(updateddRecord)
+    
 })
 
-const updateItem = catchAsync(async(req,res,next)=>{
-
-    const foodIdExist = await foodModel.findById(req.body.foodId).select("_id").lean();
-    if(!foodIdExist){
-        return next(new AppError(`food item with id ${req.body.foodId} dos not exist`))
+const deletItem  = catchAsync(async(req,res,next)=>{
+    const order = await orderModel.findById(req.params.orderId)
+    if(!order){
+        return next(new AppError('order dusent exist',400))
     }
-
-    const oderIdExist = await orderModel.findOne({_id:req.body.orderId}).select("_id").lean();
-    if(!oderIdExist){
-        return next(new AppError(`order with id ${req.body.orderId} does not exists`))
+     const deletedRecord = await orderModel.findOneAndUpdate({_id:req.params.orderId},{$pull:{orderItems:{_id:req.params.orderItemId}}}, { safe: true, multi:false })
+     if(!deletedRecord){
+         return next(new AppError('order Item dusent exist',400))
     }
-    const updatedRecord = await orderItemModel.findByIdAndUpdate(req.params.id,req.body,{new:true,runValidators:true})
-    if(!updatedRecord){
-        return next(new AppError('no data with given orderItemid'),400)
-    }
-    res.send(updatedRecord)
-})
-
-
-const getItemsByOrderId = catchAsync(async(req,res,next)=>{
-    const oid = req.params.orderId
-    const orderExist = await orderModel.findById(oid).select('_id').lean();
-    if(!orderExist){
-        return next(new AppError(`order with Id ${oid} does not exist`))
-    }
-
-    const orderItems = await orderModel.find({orderId:oid})
-    console.log(orderItems)
-    res.send(orderItems)
-})
-
-const deletItem  = catchAsync(async(req,res)=>{
-    const deletedRecord = await orderItemModel.findByIdAndDelete(req.params.id)
     res.send(deletedRecord)
 })
 
-module.exports = {getOrderItem,getOrderItem,addOrderItem,updateItem,getItemsByOrderId,deletItem,getOrderItemById}
+const addOrderItem = catchAsync(async (req, res, next) => {
+    const orderExist = await orderModel.findById(req.params.orderId);
+    if (!orderExist) {
+        return next(new AppError(`no data order with id ${req.params.orderId}`))
+    }
+    const foodExist = await foodModel.findById(req.body.foodId)
+    if (!foodExist) {
+        return next(new AppError("food does not exist"))
+    }
+
+    req.body.foodName = foodExist.food
+    req.body.unitPrice = foodExist.price * req.body.quantity
+    const record = await orderModel.findOneAndUpdate(req.params.orderId, { $push: { orderItems: req.body } },{ new: true, runValidators: true })
+    res.send(record)
+    console.log(record)
+})
+
+
+module.exports = {updateOrderItem,addOrderItem,getOrderItem,deletItem}

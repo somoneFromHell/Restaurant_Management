@@ -2,11 +2,13 @@ const { default: mongoose } = require('mongoose');
 const mongo = require('mongoose');
 mongo.set('debug', true);
 
-const orderItemModel = mongo.model('orderitem', new mongo.Schema({
-    quantity: { type: String, required: true, enum: ['small', 'medium', 'large'] },
-    unitPrice: { type: Number, required: true },
+const orderItemSchema = new mongo.Schema({
+    quantity: { type: Number, required: true,min:1},
+    unitPrice: { type: Number },
     foodId: {type: mongoose.Schema.Types.ObjectId,ref:'food',required:true},
-    orderId: { type: mongoose.Schema.Types.ObjectId,ref:'order',required:true}
-}));
+    foodName:String
+})
 
-module.exports = orderItemModel;
+const orderItemModel = mongo.model('orderitem', orderItemSchema);
+
+module.exports = orderItemSchema;
