@@ -27,9 +27,9 @@ app.use(cors({origin:'*'}))
 // }
 console.log(process.env.NODE_ENV)
 
-if(process.env.NODE_ENV === 'development'){
-    app.use(morgan('dev'));
-}
+// if(process.env.NODE_ENV === 'development'){
+//     app.use(morgan('dev'));
+// }
 
 
 app.use(bodyParser.urlencoded({ extended: false }));

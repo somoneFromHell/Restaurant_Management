@@ -17,6 +17,7 @@ const getTableById = catchAsync(async(req,res)=>{
 })
 
 const addTable = catchAsync(async(req,res)=>{
+    
     const record = await tableModel.create(req.body)
     if(record.occupied === false)record.currentGuests=0
     res.send(record)
@@ -32,6 +33,13 @@ const updateTable = catchAsync(async (req,res,next)=>{
     res.send(updatedRecord)
 })
 
+const patchTableStatus = catchAsync(async (req,res,next)=>{
+    const tableStatus = await tableModel.findById(req.params.id)
+    tableStatus.occupied = !tableStatus.occupied
+    tableStatus.save()
+    res.send(tableStatus)
+}) 
+
 const deletTable = catchAsync(async(req,res,next)=>{
 
     const deletedRecord = await tableModel.findByIdAndDelete(req.params.id)
@@ -41,4 +49,4 @@ const deletTable = catchAsync(async(req,res,next)=>{
     res.send(deletedRecord)
 })
 
-module.exports = {getTable,getTableById,addTable,updateTable,deletTable}
+module.exports = {getTable,getTableById,addTable,updateTable,patchTableStatus,deletTable}

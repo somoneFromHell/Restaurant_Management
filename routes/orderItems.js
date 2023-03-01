@@ -3,7 +3,7 @@ const { getOrderItem, addOrderItem, deletItem, updateOrderItem } = require('../c
 const router = express.Router();
 
 router.route('/:orderId').get(getOrderItem)
-router.route('/add/:orderId').put(addOrderItem)
+router.route('/add/:orderId').post(addOrderItem)
 router.route('/:orderId/:orderItemId').delete(deletItem).put(updateOrderItem)
 
 module.exports = router;

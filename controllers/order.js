@@ -47,10 +47,37 @@ const deleteOrder = catchAsync(async (req, res) => {
 
     const Deletedrecord = await orderModel.findByIdAndDelete(req.params.id)
     if (!Deletedrecord) {
-        return next(new AppError('no Data with id' + req.params))
+        return next(new AppError('no Data with id' + req.params.id))
     }
     res.send(Deletedrecord)
 
 })
 
-module.exports = { getorder, getOrderById, addOrder, updateOrder, deleteOrder }
+
+const deleteOrderbyTableId = catchAsync(async (req, res,next) => {
+
+    const record = await orderModel.find({TableId:req.params.TableId})
+    if(!record || record.invoiceGenrated === false){
+        return next(new AppError('can not delete the order' + req.params))
+    }
+    const Deletedrecord = await orderModel.findOneAndDelete({TableId:req.params.TableId})
+
+    if (!Deletedrecord) {
+        return next(new AppError('no Data with id' + req.params.TableId))
+    }
+    res.send(Deletedrecord)
+
+})
+
+const getOrderbyTableId = catchAsync(async (req, res,next) => {
+
+    const record = await orderModel.find({TableId:req.params.TableId,invoiceGenrated :false})
+    if(!record || record.invoiceGenrated === false){
+        return next(new AppError('can not delete the order' + req.params))
+    }
+    res.send(record)
+
+})
+
+
+module.exports = { getorder, getOrderById,deleteOrderbyTableId,getOrderbyTableId, addOrder, updateOrder, deleteOrder }
