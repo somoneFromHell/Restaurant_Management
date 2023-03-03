@@ -53,4 +53,4 @@ const authorize = catchAsync(async(req,res,next)=>{
     next()
 })
 
-module.exports = authorize
+module.exports = {authorize}

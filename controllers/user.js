@@ -1,10 +1,10 @@
 
 const { userModel, validateLogin, validateRegistration } = require('../models/user')
 const bcrypt = require('bcrypt')
-const config = require('config')
 const catchAsync = require('../utility/catchError')
 const AppError = require('../utility/appError')
 const { rolesModel } = require('../models/roles')
+const { decodedToken } = require('../utility/authorization')
 
 const getUsers = catchAsync(async (req, res,next) => {
         console.log("called")
@@ -13,13 +13,7 @@ const getUsers = catchAsync(async (req, res,next) => {
             return next(new AppError('Error...',400))
         }
         res.send(records)
-
-
 })
-
-const GetUserById = (req, res) => {
-
-}
 
 const login = catchAsync(async (req, res,next ) => {
 
@@ -38,7 +32,7 @@ const login = catchAsync(async (req, res,next ) => {
         res.header('Authorization',token).send({success:true,msg:token})
 })
 
-const signup = catchAsync(async (req, res) => {
+const signup = catchAsync(async (req, res,next) => {
 
         var getRole = rolesModel.findById(req.body._id)
         if(!getRole){
@@ -58,9 +52,17 @@ const signup = catchAsync(async (req, res) => {
         
         const token = record.genratAuthToken();
         res.header('Authorization',token).send({ Id: record.id, email: record.email, firstName: record.firstName, lastname: record.lastName })
-
-
-
 })
 
-module.exports = { getUsers, GetUserById, login, signup }
+
+const getPersonalData = catchAsync(async(req,res)=>{
+        var userExist = userModel.findById(req.params.id)
+        if(!userExist){
+                return next(AppError("user dusent Exist...",400))
+        }
+        
+                res.send(userExist)
+        
+})
+
+module.exports = { getUsers, getPersonalData, login, signup }

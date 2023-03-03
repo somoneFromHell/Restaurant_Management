@@ -1,8 +1,6 @@
-const Joi = require('joi');
 const mongo = require('mongoose');
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
-const { string } = require('joi');
 const { default: mongoose } = require('mongoose');
 
 const registerSchema = new mongo.Schema({
@@ -29,11 +27,11 @@ const registerSchema = new mongo.Schema({
         type: String,
         required: true,
         min: 8,
-        validate:{
-            validator: function(v){
-                return /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(v);
-            }, message:props => `${props.value} not a strong password \n must contain Minimum eight characters, at least one letter and one number`
-        }
+        // validate:{
+        //     validator: function(v){
+        //         return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(v);
+        //     }, message:props => `${props.value} not a strong password \n must contain Minimum eight characters, at least one letter and one number`
+        // }
     },
     role:{
         type: mongoose.Schema.Types.ObjectId,ref:'roles',

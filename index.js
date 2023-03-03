@@ -14,7 +14,6 @@ const orderItem = require('./routes/orderItems');
 const table = require('./routes/table');
 const user = require('./routes/user');
 const roles = require('./routes/roles')
-const authorize = require('./utility/authorization')
 var bodyParser = require('body-parser');
 const morgan = require('morgan');
 const app = express();
@@ -38,7 +37,6 @@ app.use(bodyParser.json())
 //defining route for food images
 app.use('/foodImages',express.static('public/image/food'))
 
-// app.use(authorize)
 app.use('/api/food', food);
 app.use('/api/invoice', invoice);
 app.use('/api/menu', menu);

@@ -31,11 +31,11 @@ const updateOrderItem = catchAsync(async (req, res, next) => {
     }
 
     orderItem.foodId = req.body.foodId
+    orderItem.menuId = foodExist.menuId
     orderItem.quantity = req.body.quantity
     orderItem.foodName = foodExist.food
     orderItem.unitPrice = req.body.quantity * foodExist.price
     const updated = await order.save()
-    console.log(updated)
     res.send(orderItem)
 
 })
@@ -67,25 +67,26 @@ const addOrderItem = catchAsync(async (req, res, next) => {
 
     var orderItemInOrder = orderExist.orderItems.filter(i => i.foodId.toHexString() === req.body.foodId)
 
-    console.log(orderItemInOrder)
-
-    req.body.foodName = foodExist.food
-    req.body.unitPrice = foodExist.price * req.body.quantity
 
 
     if (orderItemInOrder.length > 0) {
 
-        orderItemInOrder.quantity += req.body.quantity
-        orderItemInOrder.unitPrice = quantity * foodExist.price
-        const updated = await order.save()
+        orderItemInOrder[0].quantity += req.body.quantity
+        orderItemInOrder[0].unitPrice = orderItemInOrder.quantity * foodExist.price
+        const updated = await orderExist.save()
         console.log(updated)
-        res.send(orderItem)
+        res.send(updated)
+        
 
     } else {
+        req.body.foodName = foodExist.food
+        req.body.menuId = foodExist.menuId
+        req.body.unitPrice = foodExist.price * req.body.quantity
+    
+    
 
         const record = await orderModel.findOneAndUpdate(orderExist._id, { $push: { orderItems: req.body } }, { new: true, runValidators: true })
         res.send(record)
-        console.log(orderItemInOrder)
     }
 })
 
