@@ -24,11 +24,10 @@ app.use(cors({origin:'*'}))
 //     console.error('Error:jwtprivate1key is not defined')
 //     process.exit(0);
 // }
-console.log(process.env.NODE_ENV)
 
-// if(process.env.NODE_ENV === 'development'){
-//     app.use(morgan('dev'));
-// }
+if(process.env.NODE_ENV === 'development'){
+    app.use(morgan('dev'));
+}
 
 
 app.use(bodyParser.urlencoded({ extended: false }));

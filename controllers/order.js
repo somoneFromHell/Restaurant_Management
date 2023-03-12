@@ -30,17 +30,17 @@ const addOrder = catchAsync(async (req, res, next) => {
 
 
 
-const updateOrder = catchAsync(async (req, res, next) => {
-    const TebleExist = await tableModel.findById(req.body.TableId);
-    if (!TebleExist) {
-        return next(new AppError("table don not exist", 400))
-    }
+const changeOrderStatus = catchAsync(async (req, res, next) => {
 
-    const updatedrecord = await orderModel.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
-    if (!updatedrecord) {
+    const order = await orderModel.findById(req.params.id)
+    if (!order) {
         return next(new AppError('no data with given order id' + req.params.id, 404))
     }
-    res.send(updatedrecord)
+
+    order.invoiceGenrated = !order.invoiceGenrated
+    order.save()
+    res.send(order)
+
 })
 
 const deleteOrder = catchAsync(async (req, res) => {
@@ -61,7 +61,7 @@ const deleteOrderbyTableId = catchAsync(async (req, res,next) => {
         return next(new AppError('can not delete the order' + req.params))
     }
     const Deletedrecord = await orderModel.findOneAndDelete({TableId:req.params.TableId})
-
+    console.log(Deletedrecord)
     if (!Deletedrecord) {
         return next(new AppError('no Data with id' + req.params.TableId))
     }
@@ -75,9 +75,9 @@ const getOrderbyTableId = catchAsync(async (req, res,next) => {
     if(!record || record.invoiceGenrated === false){
         return next(new AppError('can not delete the order' + req.params))
     }
-    res.send(record)
+    res.send(record[0])
 
 })
 
 
-module.exports = { getorder, getOrderById,deleteOrderbyTableId,getOrderbyTableId, addOrder, updateOrder, deleteOrder }
+module.exports = { getorder, getOrderById,deleteOrderbyTableId,getOrderbyTableId, addOrder, changeOrderStatus, deleteOrder }

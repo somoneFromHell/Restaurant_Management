@@ -4,16 +4,18 @@ const bcrypt = require('bcrypt')
 const catchAsync = require('../utility/catchError')
 const AppError = require('../utility/appError')
 const { rolesModel } = require('../models/roles')
+const jwt = require('jsonwebtoken')
+
 const { decodedToken } = require('../utility/authorization')
 
 const getUsers = catchAsync(async (req, res,next) => {
-        console.log("called")
         const records = userModel.find()
         if(!records){
             return next(new AppError('Error...',400))
         }
         res.send(records)
 })
+
 
 const login = catchAsync(async (req, res,next ) => {
 
@@ -23,12 +25,14 @@ const login = catchAsync(async (req, res,next ) => {
 
         const user = await userModel.findOne({ email: req.body.email });
         if (!user) next(new AppError('incorrect email or password !!',400));
-        
-        console.log(user)
 
         const validPassword = bcrypt.compareSync(req.body.password,user.password)
         if (!validPassword) next(new AppError('incorrect email or password !!',400));
-        const token = user.genratAuthToken();
+
+        const findRole = await rolesModel.findById(user.role)
+        if (!findRole){return next(new AppError('role dusent exist',404))} 
+
+        const token = jwt.sign({Data: user,pages:findRole.pages}, "jwtPrivateKey",{expiresIn:'1d'})
         res.header('Authorization',token).send({success:true,msg:token})
 })
 
@@ -50,7 +54,7 @@ const signup = catchAsync(async (req, res,next) => {
                 role:req.body.role
         });
         
-        const token = record.genratAuthToken();
+        const token = jwt.sign({Data: record,pages:getRole.pages}, "jwtPrivateKey",{expiresIn:'1d'})
         res.header('Authorization',token).send({ Id: record.id, email: record.email, firstName: record.firstName, lastname: record.lastName })
 })
 

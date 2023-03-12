@@ -1,5 +1,4 @@
 const mongo = require('mongoose');
-const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
 const { default: mongoose } = require('mongoose');
 
@@ -43,17 +42,9 @@ const registerSchema = new mongo.Schema({
 registerSchema.pre('save', async function (next) {
     // only run when password i modified
     if (!this.isModified('password')) return next();
-
     // hash the password
     this.password = await bcrypt.hash(this.password, 10)
 })
-
-
-
-registerSchema.methods.genratAuthToken = function(){
-    const token = jwt.sign({id: this._id}, "jwtPrivateKey",{expiresIn:'1d'})
-    return token;
-}
 
 // compare change password date with tocken isueing date 
 registerSchema.methods.changePasswordAfter = function(jwtTimeStamp){
@@ -61,7 +52,6 @@ registerSchema.methods.changePasswordAfter = function(jwtTimeStamp){
          const changeTimeStamp = parseInt(
              this.passwordChangedAt.getTime()/1000,10
         )
-        console.log(changeTimeStamp,jwtTimeStamp);
         return jwtTimeStamp>changeTimeStamp
     }
     return false;

@@ -3,9 +3,7 @@ const orderModel = require('../models/order')
 const foodModel = require('../models/Food')
 const AppError = require('../utility/appError')
 const catchAsync = require('../utility/catchError')
-const orderItemSchema = require('../models/orderItems')
-const { Model } = require('mongoose')
-const { response } = require('express')
+
 
 
 const getOrderItem = catchAsync(async (req, res, next) => {
@@ -56,11 +54,15 @@ const deletItem = catchAsync(async (req, res, next) => {
 })
 
 const addOrderItem = catchAsync(async (req, res, next) => {
+
+    
     const orderExist = await orderModel.findOne({ TableId: req.params.orderId });
     if (!orderExist) {
         return next(new AppError(`no data order with id ${req.params.orderId}`))
     }
-    const foodExist = await foodModel.findById(req.body.foodId)
+    
+    const foodExist = await foodModel.findOne({_id:req.body.foodId})
+    console.log(req.body)
     if (!foodExist) {
         return next(new AppError("food does not exist"))
     }
@@ -74,7 +76,6 @@ const addOrderItem = catchAsync(async (req, res, next) => {
         orderItemInOrder[0].quantity += req.body.quantity
         orderItemInOrder[0].unitPrice = orderItemInOrder.quantity * foodExist.price
         const updated = await orderExist.save()
-        console.log(updated)
         res.send(updated)
         
 

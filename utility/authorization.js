@@ -12,30 +12,32 @@ const authorize = catchAsync(async(req,res,next)=>{
     if(Api === 'user'){return next()}
 
     let token 
-    if(req.header('Authorization') &&  req.header('Authorization').startsWith('Bearer'))
+    if(req.header('Authorization') )
     {
-        token = req.header('Authorization').split(' ')[1];
+        token = req.header('Authorization').split(' ')[1].replace(/"|'/g, '');
+        // console.log(token)
+        
     }
 
     if(!token) return next(new AppError('your not logged in',401));
 // decode the token 
     const decoded = await promisify(jwt.verify)(token,'jwtPrivateKey')
-    console.log(decoded)
+    // console.log(decoded)
 
    
 
 // (3) cheak if user still exist after the token is isued
-    const currentUser = await userModel.findById(decoded.id)
+    const currentUser = await userModel.findById(decoded.Data)
     if(!currentUser){
         return next(new AppError('the user mentioned in token duse no longar Exist',401))
     }
 
-    //    (2) cheak if the user is allowd to execute this operation
+//    (2) cheak if the user is allowd to execute this operation
 
     const userRole = await rolesModel.findById(currentUser.role)
     const routInRole = userRole.routs.filter((item)=>item.name === Api)
    // console.log(Api,routInRole)
-    if(!routInRole.length){
+    if(!routInRole){
         return next(new AppError(`You are not authorized to access this route ${Api}`,401))
     }
     
