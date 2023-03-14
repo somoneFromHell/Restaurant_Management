@@ -1,5 +1,5 @@
 
-const { userModel, validateLogin, validateRegistration } = require('../models/user')
+const { userModel } = require('../models/user')
 const bcrypt = require('bcrypt')
 const catchAsync = require('../utility/catchError')
 const AppError = require('../utility/appError')
@@ -9,17 +9,32 @@ const jwt = require('jsonwebtoken')
 const { decodedToken } = require('../utility/authorization')
 
 const getUsers = catchAsync(async (req, res,next) => {
-        const records = userModel.find()
+        const records = await userModel.find()
         if(!records){
             return next(new AppError('Error...',400))
         }
         res.send(records)
 })
 
+const getUserbyEmail = catchAsync(async (req, res,next) => {
+        const records = await userModel.findById(req.params.id)
+        console.log(records)
+        if(!records){
+            return next(new AppError('Error...',400))
+        }
+        res.send(records)
+})
+
+const UpdateUserbyEmail = catchAsync(async (req, res,next) => {
+        const records = await userModel.findById(req.params.id)
+        if(!records){
+            return next(new AppError('user dusent exist',400))
+        }
+       const updatedUser = userModel.findByIdAndUpdate(req.params.id,req.body, { new: true, runValidators: true })
+        res.send(updatedUser)
+})
 
 const login = catchAsync(async (req, res,next ) => {
-
-
         var {email,password} = new userModel(req.body);
         if (!email||!password) return res.status(400).send("not enaugh data")
 
@@ -32,7 +47,7 @@ const login = catchAsync(async (req, res,next ) => {
         const findRole = await rolesModel.findById(user.role)
         if (!findRole){return next(new AppError('role dusent exist',404))} 
 
-        const token = jwt.sign({Data: user,pages:findRole.pages}, "jwtPrivateKey",{expiresIn:'1d'})
+        const token = jwt.sign({Data: user,pages:findRole.pages,roleTitle:findRole.roleName}, "jwtPrivateKey",{expiresIn:'1d'})
         res.header('Authorization',token).send({success:true,msg:token})
 })
 
@@ -59,14 +74,6 @@ const signup = catchAsync(async (req, res,next) => {
 })
 
 
-const getPersonalData = catchAsync(async(req,res)=>{
-        var userExist = userModel.findById(req.params.id)
-        if(!userExist){
-                return next(AppError("user dusent Exist...",400))
-        }
-        
-                res.send(userExist)
-        
-})
 
-module.exports = { getUsers, getPersonalData, login, signup }
+
+module.exports = { getUsers, getUserbyEmail,UpdateUserbyEmail, login, signup }

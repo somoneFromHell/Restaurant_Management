@@ -83,8 +83,6 @@ const addOrderItem = catchAsync(async (req, res, next) => {
         req.body.foodName = foodExist.food
         req.body.menuId = foodExist.menuId
         req.body.unitPrice = foodExist.price * req.body.quantity
-    
-    
 
         const record = await orderModel.findOneAndUpdate(orderExist._id, { $push: { orderItems: req.body } }, { new: true, runValidators: true })
         res.send(record)

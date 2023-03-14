@@ -65,7 +65,7 @@ const updateFood = catchAsync(async (req, res,next) => {
 })
 
 const addFood = catchAsync(async (req, res,next) => {
-        console.log(req.file)
+        console.log(req.body)
         menuExist = await menuModel.findById(req.body.menuId)
         if(!menuExist){
                 return next(new AppError(`no data with given menuId ${req.body.menuId}`,404))

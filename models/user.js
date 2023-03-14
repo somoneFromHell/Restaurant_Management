@@ -36,6 +36,10 @@ const registerSchema = new mongo.Schema({
         type: mongoose.Schema.Types.ObjectId,ref:'roles',
         required:true
     },
+    birthDate:{type:String},
+    gender:{type:String},
+    address:{type:String}
+    ,
     passwordChangedAt:Date
 })
 
