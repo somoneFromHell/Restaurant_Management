@@ -23,7 +23,6 @@ const multerFilter = (req,file,cb)=>{
                 cb(new AppError('not an image',400),false)
         }
 }
-
 const upload = multer({storage:multarStorage,fileFilter:multerFilter})
 
 
@@ -57,15 +56,21 @@ const getFoodByMenuId = catchAsync(async(req,res,next)=>{
 
 const updateFood = catchAsync(async (req, res,next) => {
 
+        menuExist = await menuModel.findById(req.body.menuId)
+        if(!menuExist){
+                return next(new AppError(`no data with given menuId ${req.body.menuId}`,404))
+        }
+        if(req.file){req.body.foodImage = req.file.filename;}
+        else{req.body.foodImage = 'noimage.jpg'}
         const record = await foodModel.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
         if (!record) {
             return next(new AppError('no Data with id'+req.params.id,404))
         }
+        
         res.send(record)
 })
 
 const addFood = catchAsync(async (req, res,next) => {
-        console.log(req.body)
         menuExist = await menuModel.findById(req.body.menuId)
         if(!menuExist){
                 return next(new AppError(`no data with given menuId ${req.body.menuId}`,404))

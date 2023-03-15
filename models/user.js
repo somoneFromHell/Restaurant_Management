@@ -38,8 +38,8 @@ const registerSchema = new mongo.Schema({
     },
     birthDate:{type:String},
     gender:{type:String},
-    address:{type:String}
-    ,
+    address:{type:String},
+    profileImage:{type:String},
     passwordChangedAt:Date
 })
 

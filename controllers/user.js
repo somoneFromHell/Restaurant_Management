@@ -5,8 +5,30 @@ const catchAsync = require('../utility/catchError')
 const AppError = require('../utility/appError')
 const { rolesModel } = require('../models/roles')
 const jwt = require('jsonwebtoken')
+const multer = require('multer')
 
-const { decodedToken } = require('../utility/authorization')
+
+const multarStorage = multer.diskStorage({
+        destination:(req,file,cb)=>{
+                cb(null,"public/image/user/")
+        },
+        filename(req,file,cb){
+                const ext = file.mimetype.split('/')[1];
+                cb(null,`${req.body.firstName}-${Date.now()}.${ext}`)
+        }
+})
+
+const multarFilter = (req,file,cb)=>{
+        if(file.mimetype.split('/')[0]==="image"){
+                cb(null,true)       
+        }else{
+                cb(new AppError('not an image',400),false)
+        }
+}
+
+const upload = multer({storage:multarStorage,fileFilter:multarFilter})
+
+const userImageUpload = upload.single('profileImage')
 
 const getUsers = catchAsync(async (req, res,next) => {
         const records = await userModel.find()
@@ -17,11 +39,13 @@ const getUsers = catchAsync(async (req, res,next) => {
 })
 
 const getUserbyEmail = catchAsync(async (req, res,next) => {
+
         const records = await userModel.findById(req.params.id)
         console.log(records)
         if(!records){
             return next(new AppError('Error...',400))
         }
+       
         res.send(records)
 })
 
@@ -30,7 +54,9 @@ const UpdateUserbyEmail = catchAsync(async (req, res,next) => {
         if(!records){
             return next(new AppError('user dusent exist',400))
         }
-       const updatedUser = userModel.findByIdAndUpdate(req.params.id,req.body, { new: true, runValidators: true })
+        if(req.file){req.body.profileImage = req.file.filename;}
+        else{req.body.profileImage = 'noimage.jpg'}
+       const updatedUser = await userModel.findByIdAndUpdate(req.params.id,req.body, { new: true, runValidators: true })
         res.send(updatedUser)
 })
 
@@ -68,7 +94,6 @@ const signup = catchAsync(async (req, res,next) => {
                 password:req.body.password,
                 role:req.body.role
         });
-        
         const token = jwt.sign({Data: record,pages:getRole.pages}, "jwtPrivateKey",{expiresIn:'1d'})
         res.header('Authorization',token).send({ Id: record.id, email: record.email, firstName: record.firstName, lastname: record.lastName })
 })
@@ -76,4 +101,4 @@ const signup = catchAsync(async (req, res,next) => {
 
 
 
-module.exports = { getUsers, getUserbyEmail,UpdateUserbyEmail, login, signup }
+module.exports = { getUsers,userImageUpload ,getUserbyEmail,UpdateUserbyEmail, login, signup }

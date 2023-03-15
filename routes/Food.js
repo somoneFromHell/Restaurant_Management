@@ -7,7 +7,7 @@ const {imageUpload,getFoodByMenuId, getFoodById, getFood, addFood, updateFood, d
 router.use(authorize)
 
 router.route('/').post(imageUpload,addFood).get(getFood)
-router.route('/:id').get(getFoodById).put(updateFood).delete(deletFood)
+router.route('/:id').get(getFoodById).put(imageUpload,updateFood).delete(deletFood)
 router.route('/bymenu/:menuId').get(getFoodByMenuId)
 
 module.exports = router;

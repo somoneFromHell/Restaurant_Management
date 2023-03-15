@@ -34,7 +34,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
 
 //defining route for food images
-app.use('/foodImages',express.static('public/image/food'))
+app.use('/api/foodImages',express.static('public/image/food'))
+app.use('/api/userImages',express.static('public/image/user'))
 
 app.use('/api/food', food);
 app.use('/api/invoice', invoice);
