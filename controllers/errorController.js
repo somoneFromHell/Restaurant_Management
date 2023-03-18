@@ -34,12 +34,14 @@ const sendErrorProd = (err,res)=>{
     if(err.isOperational){
         res.status(err.statusCode).send({
             status:err.status,
+            success:false,
             message:err.message
         })
         // programming related error which should not be known to client
     }else{
         res.status(500).send({
             status:'err',
+            success:false,
             message:'something wrong with the program.go shout at the backend dev'
         })
     }

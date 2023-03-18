@@ -8,6 +8,9 @@ const catchAsync = require('../utility/catchError')
 
 const getorder = catchAsync(async (req, res) => {
     const records = await orderModel.find()
+    if (!record) {
+        return next(new AppError("no data with Id" + req.params.id, 400))
+    }
     res.send(records)
 })
 
@@ -63,7 +66,7 @@ const deleteOrderbyTableId = catchAsync(async (req, res,next) => {
     const Deletedrecord = await orderModel.findOneAndDelete({TableId:req.params.TableId})
     console.log(Deletedrecord)
     if (!Deletedrecord) {
-        return next(new AppError('no Data with id' + req.params.TableId))
+        return next(new AppError('no Data with id' + req.params.TableId,false))
     }
     res.send(Deletedrecord)
 

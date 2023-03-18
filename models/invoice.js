@@ -1,13 +1,11 @@
 const { default: mongoose } = require('mongoose');
 const mongo = require('mongoose');
+const orderItemSchema = require('./orderItems');
 
 const invoiceModel = mongo.model('invoice',new mongo.Schema({
 
-    orderId:{type:mongoose.Schema.Types.ObjectId,ref:'order',required:true},
-    paymentMethod:{type:String,required:true,enum:['card','cash']},
-    paymentStatus:{type:String,required:true,enum:['pending','success']},
-    paymentDeueDate:{type:Date,required:true},
     tableNumber:{type:String,required:true},
+    orderItems:{type:[orderItemSchema],required:true},
     totalAmount:{type:Number,required:true},
     subTotal:{type:Number,required:true},
     cGst:{type:Number,required:true},

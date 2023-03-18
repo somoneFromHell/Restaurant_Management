@@ -21,13 +21,9 @@ const getInvoiceById = catchAsync(async(req,res)=>{
 
 const addInvoice = catchAsync(async (req,res,next)=>{
 
-    orderExist = await orderModel.findById(req.body.orderId)
-    if(!orderExist){
-        return next(new AppError("order dusent exist"),404)
-    }
     const record = await invoiceModel.create(req.body)
     console.log(req.body)
-    res.send(record)
+    res.send({Success:true,Message:"invoice saved successfully",Data:record})
     
 })
 

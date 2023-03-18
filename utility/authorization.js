@@ -19,7 +19,7 @@ const authorize = catchAsync(async(req,res,next)=>{
         
     }
 
-    if(!token) return next(new AppError('your not logged in',401));
+    if(!token) return next(new AppError('your not logged in',false));
 // decode the token 
     const decoded = await promisify(jwt.verify)(token,'jwtPrivateKey')
     // console.log(decoded)
