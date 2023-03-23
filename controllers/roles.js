@@ -8,8 +8,7 @@ const catchAsync = require('../utility/catchError')
     if(!records){
         return next(new AppError("empty..."))
     }
-    console.log(req.originalUrl)
-    console.log(req.method)
+    console.log(req)
     res.send(records)
 })
 

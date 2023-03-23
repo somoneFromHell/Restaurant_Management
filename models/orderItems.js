@@ -6,8 +6,8 @@ const orderItemSchema = new mongo.Schema({
     unitPrice: { type: Number },
     foodId: {type: mongoose.Schema.Types.ObjectId,ref:'food',required:true},
     menuId: {type: mongoose.Schema.Types.ObjectId,ref:'menu',required:true},
-
-    foodName:String
+    foodName:String,
+    price:Number
 })
 
 const orderItemModel = mongo.model('orderitem', orderItemSchema);

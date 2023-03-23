@@ -16,7 +16,8 @@ const getInvoiceById = catchAsync(async(req,res)=>{
     if (!record) {
         return next(new AppError('no Data with id'+req.params.id,404))
     }
-    res.send(record)
+    console.log("get invoice called")
+    res.send({Success:true,Data:record})
 })
 
 const addInvoice = catchAsync(async (req,res,next)=>{
