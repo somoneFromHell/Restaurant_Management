@@ -29,7 +29,7 @@ const upload = multer({storage:multarStorage,fileFilter:multerFilter})
 const imageUpload = upload.single('foodImage')
 
 const getFood = catchAsync(async (req, res) => {
-        const records = await foodModel.find()
+        const records = await foodModel.aggregate([{$lookup:{from:'menus',}}])
         if (!records) {
             return next(new AppError('empty...'))
         }
